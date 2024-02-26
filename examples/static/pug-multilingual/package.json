@@ -1,0 +1,27 @@
+{
+  "name": "pug-demo",
+  "version": "1.0.0",
+  "description": "this is the description",
+  "main": "app.js",
+  "scripts": {
+    "build": "webpack --progress --mode production",
+    "start": "webpack serve --progress --mode development"
+  },
+  "author": "@averyano",
+  "license": "ISC",
+  "devDependencies": {
+    "@webdiscus/pug-loader": "^2.10.6",
+    "clean-webpack-plugin": "^4.0.0",
+    "css-loader": "^6.10.0",
+    "html-webpack-plugin": "^5.6.0",
+    "pug": "^3.0.2",
+    "style-loader": "^3.3.4",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.2"
+  },
+  "dependencies": {
+    "semver-compare": "^1.0.0",
+    "ua-parser-js": "^1.0.37"
+  }
+}

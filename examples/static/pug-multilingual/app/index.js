@@ -71,6 +71,7 @@ class App {
 
 		this.avery.start();
 		this.avery.loader.current.page.show();
+		console.log(this.avery);
 	}
 }
 new App();

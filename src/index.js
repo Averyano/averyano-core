@@ -33,6 +33,7 @@ export default class Avery extends NodeEmitter {
 
 		const isWebpSupported = await checkWebpSupport(); // checks webp support
 		console.log(`Webp: ${isWebpSupported}`);
+		window.isWebp = isWebpSupported;
 	};
 
 	// runAnalyticsConfigFirebase = ({ config }) => {

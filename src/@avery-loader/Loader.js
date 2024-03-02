@@ -158,8 +158,11 @@ export default class Loader extends NodeEmitter {
 		const currentPage = this.findPageObjectByPath(path);
 
 		if (!currentPage) {
+			console.log('No page found! Returning 404.');
 			return this.page404;
 		}
+
+		console.log('currentPage', currentPage);
 
 		return currentPage;
 	}
@@ -211,7 +214,10 @@ export default class Loader extends NodeEmitter {
 		const currentPath = window.location.pathname;
 
 		// Create a regex pattern from the LOCALES array
-		const localePattern = LOCALES.map((locale) => locale.code).join('|');
+		const localePattern =
+			LOCALES && LOCALES.length > 0
+				? LOCALES.map((locale) => locale.code).join('|')
+				: [];
 		const regex = new RegExp(`^/(${localePattern})(/.*)?$`);
 
 		// Extract locale and path
@@ -239,14 +245,21 @@ export default class Loader extends NodeEmitter {
 			this.$emit('resetState');
 			const dataElementLink = elementWithHref.getAttribute('data-element-link');
 			if (dataElementLink) {
-				return this.emit('scrollTo', dataElementLink);
+				return this.$emit('scrollTo', dataElementLink);
 			}
 		} else if (elementWithHref.hasAttribute('data-page-link')) {
 			const websiteUrl = window.location.origin;
 			const thePath = getPathFromURL(href);
-			const addLocaleString =
+			let addLocaleString =
 				current.locale && current.locale.length > 0 ? `${current.locale}` : '';
-			const newUrl = `${websiteUrl}/${addLocaleString}${thePath}`;
+
+			// if addLocaleString doesn't start with "/" add "/"
+			if (addLocaleString && !addLocaleString.startsWith('/')) {
+				addLocaleString = `/${addLocaleString}`;
+			}
+
+			const newUrl = `${websiteUrl}${addLocaleString}${thePath}`;
+
 			// Change the page or scroll to an element on the new page
 			this.onChange({
 				url: newUrl,
@@ -412,7 +425,7 @@ export default class Loader extends NodeEmitter {
 		this.isChanging = false;
 		this.clickedTheLink = false;
 
-		if (scrollTo) this.emit('scrollTo', scrollTo);
+		if (scrollTo) this.$emit('scrollTo', scrollTo);
 	}
 
 	start() {

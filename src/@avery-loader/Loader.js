@@ -310,12 +310,6 @@ export default class Loader extends NodeEmitter {
 
 	addEventListeners() {
 		window.addEventListener('popstate', this.onPopState.bind(this));
-		window.addEventListener('DOMContentLoaded', (event) => {
-			setTimeout(() => {
-				console.log(window.location.hash);
-				this.emit('scrollToCentered', window.location.hash);
-			}, 1000);
-		});
 	}
 
 	/**

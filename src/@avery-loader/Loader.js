@@ -150,7 +150,13 @@ export default class Loader extends NodeEmitter {
 	}
 
 	findPageObjectByPath(path) {
-		return this.pages.find((pageObject) => pageObject.url.includes(path));
+		// path = /store/2yLNbq7s7KMhF76fBUeT
+		// console.log(path, this.pages);
+
+		let page = this.pages.find((pageObject) => pageObject.url.includes(path));
+		if (!page) {
+			return this.pages[this.pages.length - 1];
+		} else return page;
 	}
 
 	pickPage(url = window.location.href) {

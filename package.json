@@ -1,6 +1,6 @@
 {
 	"name": "@averyano/core",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"description": "JavaScript library for front-end web development.",
 	"main": "src/index.js",
 	"scripts": {

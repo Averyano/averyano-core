@@ -1,5 +1,9 @@
 # Change log
 
+## 0.0.7 (2025-04-06)
+
+- minor store routing fix
+
 ## 0.0.4 (2024-03-02)
 
 - routing fix (// to /)

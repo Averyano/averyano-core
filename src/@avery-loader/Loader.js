@@ -195,7 +195,7 @@ export default class Loader extends NodeEmitter {
 		}
 
 		console.log(this.current, foundPage);
-		if (this.current.page.id === foundPage.page.id) return true;
+		if (this.current.page.id === foundPage.page.id && !foundPage.page.itemId) return true;
 		else return false;
 	}
 

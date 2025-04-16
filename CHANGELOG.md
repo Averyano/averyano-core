@@ -1,5 +1,9 @@
 # Change log
 
+## 0.0.8 (2025-04-17)
+
+- same page routing fixed
+
 ## 0.0.7 (2025-04-06)
 
 - minor store routing fix

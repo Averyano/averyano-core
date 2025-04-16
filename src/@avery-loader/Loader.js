@@ -150,13 +150,43 @@ export default class Loader extends NodeEmitter {
 	}
 
 	findPageObjectByPath(path) {
-		// path = /store/2yLNbq7s7KMhF76fBUeT
-		// console.log(path, this.pages);
-
-		let page = this.pages.find((pageObject) => pageObject.url.includes(path));
-		if (!page) {
+		console.log(this.pages);
+	
+		let matchedPage = this.pages.find((pageObject) => {
+			// If url is an array, check if any entry includes the path
+			if (Array.isArray(pageObject.url)) {
+				return pageObject.url.includes(path);
+			}
+	
+			// Exact match
+			if (pageObject.url === path) {
+				return true;
+			}
+	
+			// Handle dynamic route like /store/:id
+			if (pageObject.url.includes('/:')) {
+				const basePath = pageObject.url.split('/:')[0];
+				if (path.startsWith(basePath)) {
+					const id = path.replace(basePath + '/', '');
+					// Check if data contains that id
+					const item = pageObject.data?.find((d) => d.id === id);
+					if (item) {
+						pageObject.page.itemId = id;
+						pageObject.page.item = item;
+						return true;
+					}
+				}
+			}
+	
+			return false;
+		});
+	
+		console.log(matchedPage);
+	
+		// Return NotFound page as fallback
+		if (!matchedPage) {
 			return this.pages[this.pages.length - 1];
-		} else return page;
+		} else return matchedPage;
 	}
 
 	pickPage(url = window.location.href) {
@@ -188,14 +218,16 @@ export default class Loader extends NodeEmitter {
 
 	// <a> tag elements
 	checkIfSamePage(current, clicked) {
+		console.log(current, clicked);
+		const currentPage = this.findPageObjectByPath(current.path);
 		const foundPage = this.findPageObjectByPath(clicked.path);
 		if (!foundPage) {
 			console.warn('No page found');
 			return false;
 		}
 
-		console.log(this.current, foundPage);
-		if (this.current.page.id === foundPage.page.id && !foundPage.page.itemId) return true;
+		console.log(currentPage, foundPage);
+		if (currentPage.page.id === foundPage.page.id && !foundPage.page.itemId) return true;
 		else return false;
 	}
 

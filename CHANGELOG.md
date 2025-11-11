@@ -1,5 +1,9 @@
 # Change log
 
+## 0.0.9 (2025-11-11)
+
+- [data-lang-code] for multilingual SPA
+
 ## 0.0.8 (2025-04-17)
 
 - same page routing fixed

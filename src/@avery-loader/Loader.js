@@ -233,7 +233,6 @@ export default class Loader extends NodeEmitter {
 
 	clickLink(event) {
 		if (this.clickedTheLink || this.isChanging) return;
-
 		this.clickedTheLink = true;
 
 		function findLinkElement(element) {
@@ -269,15 +268,26 @@ export default class Loader extends NodeEmitter {
 		const current = extractLocaleAndPath(currentPath);
 		const clicked = extractLocaleAndPath(clickedLinkPath);
 
-		// let isSamePage =
-		// 	current.locale === clicked.locale && current.path === clicked.path;
 		let isSamePage = this.checkIfSamePage(current, clicked);
 
+		// Helpers to build locale paths safely
+		const ensurePrefixedPath = (locale, path) => {
+			if (!locale) return path;
+			// path expected WITHOUT locale prefix (extractLocaleAndPath already strips it)
+			if (path === '/') return `/${locale}`;
+			return `/${locale}${path}`;
+		};
+
+		const localeInPath = (locale, path) =>
+			locale && path.startsWith(`/${locale}`); // utility if needed later
+
+		// Console logs kept (optional)
 		console.log('current', current);
 		console.log('clicked', clicked);
 		console.log('isSamePage', isSamePage);
+		console.log(elementWithHref.hasAttribute('data-lang-code'));
 
-		if (isSamePage) {
+		if (isSamePage && !elementWithHref.hasAttribute('data-lang-code')) {
 			// Scroll to an element if required
 			this.clickedTheLink = false;
 			this.$emit('resetState');
@@ -285,24 +295,41 @@ export default class Loader extends NodeEmitter {
 			if (dataElementLink) {
 				return this.$emit('scrollTo', dataElementLink);
 			}
-		} else if (elementWithHref.hasAttribute('data-page-link')) {
+		} else if (elementWithHref.hasAttribute('data-lang-code')) {
+			// LANGUAGE SWITCH
 			const websiteUrl = window.location.origin;
-			const thePath = getPathFromURL(href);
-			let addLocaleString =
-				current.locale && current.locale.length > 0 ? `${current.locale}` : '';
-
-			// if addLocaleString doesn't start with "/" add "/"
-			if (addLocaleString && !addLocaleString.startsWith('/')) {
-				addLocaleString = `/${addLocaleString}`;
-			}
-
-			const newUrl = `${websiteUrl}${addLocaleString}${thePath}`;
-
-			// Change the page or scroll to an element on the new page
+			const targetLocale = elementWithHref.getAttribute('data-lang-code');
+			const newPath = ensurePrefixedPath(targetLocale, current.path);
+			const newUrl = `${websiteUrl}${newPath}`;
 			this.onChange({
 				url: newUrl,
 				scrollTo: elementWithHref.getAttribute('data-element-link'),
 			});
+		} else if (elementWithHref.hasAttribute('data-page-link')) {
+			// NORMAL PAGE LINK
+			const websiteUrl = window.location.origin;
+			let thePath = getPathFromURL(href); // may already include locale
+			// Avoid duplicating locale prefix if href already contains it
+			if (
+				current.locale &&
+				thePath.startsWith(`/${current.locale}/`)
+			) {
+				// keep as-is
+			} else if (current.locale && thePath === `/${current.locale}`) {
+				// keep as-is (root locale)
+			} else if (current.locale && !thePath.startsWith(`/${current.locale}`)) {
+				// add locale prefix
+				thePath =
+					thePath === '/' ? `/${current.locale}` : `/${current.locale}${thePath}`;
+			}
+			const newUrl = `${websiteUrl}${thePath}`;
+			this.onChange({
+				url: newUrl,
+				scrollTo: elementWithHref.getAttribute('data-element-link'),
+			});
+		} else {
+			// No recognized attributes; reset state
+			this.clickedTheLink = false;
 		}
 	}
 
